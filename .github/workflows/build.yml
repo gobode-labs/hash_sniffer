@@ -1,0 +1,26 @@
+name: Build and Test Packet Sniffer
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install -y build-essential libpcap-dev libssl-dev
+
+      - name: Compile source code
+        run: |
+          g++ -std=c++17 -Wall -Wextra -c main.cpp -o main.o
+          g++ -std=c++17 -Wall -Wextra -c sniffer.cpp -o sniffer.o
+          g++ -std=c++17 -Wall -Wextra -o hash_sniffer main.o sniffer.o -lpcap -lssl -lcrypto
+
+      - name: Run basic help command
+        run: ./hash_sniffer --help || echo "No help implemented yet"
+
